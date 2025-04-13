@@ -2,16 +2,25 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import pandas as pd
 
-doc = "x_train.csv"
 
-data_frame = pd.read_csv(doc)
+def initialize(xtrain, ytrain):
 
-corpus = data_frame[['text']]
-corpus_list = [x for str in corpus['text'] if (x := str)]
+    data_frame = pd.read_csv(xtrain)
+    y_result_df = pd.read_csv(ytrain)
+    y_result = y_result_df.to_numpy()
 
-vectorizer = TfidfVectorizer()
-matrix = vectorizer.fit_transform(corpus_list)
-print(vectorizer.get_feature_names_out())
-print(matrix.shape)
+    corpus = data_frame[['text']]
+    corpus_list = [x for str in corpus['text'] if (x := str)]
 
-print(matrix)
+    vectorizer = TfidfVectorizer()
+    matrix = vectorizer.fit_transform(corpus_list)
+    matrix = matrix.toarray()
+
+    N = matrix.shape[0]
+    p = matrix.shape[1]
+
+    matrix = np.c_[matrix, np.ones(N)]
+
+    weights = np.ones((p+1, 1))
+
+    return matrix, y_result, weights
